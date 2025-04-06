@@ -1,0 +1,104 @@
+- 👋 Hi, I’m @janlostudios
+- 👀 I’m interested in Austria 
+- 🌱 I’m currently learning how make a digital shop
+- 💞️ I’m looking to collaborate on Videos or Podcasts
+- 📫 How to reach me on my shop  via Chat.
+- 
+- 
+
+<!---
+janlostudios/janlostudios is a ✨ special ✨ repository because its `README.md` (this file) appears on your GitHub profile.
+You can click the Preview link to take a look at your .
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Janlo Studios Shop</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <header>
+    <h1>Janlo Studios Shop</h1>
+  </header>  <main>
+    <!-- Collier Bag Product -->
+    <section class="product">
+      <h2>Collier Bag</h2>
+      <p>Premium digital item by Janlo Studios</p>
+      <button onclick="purchaseCollier()">Buy Now</button>
+    </section>
+  </main>  <!-- Admin Dashboard -->  <section class="admin">
+    <h2>Admin Login</h2>
+    <input type="password" id="password" placeholder="Enter Admin Password" />
+    <button onclick="login()">Login</button>
+    <div id="dashboard" style="display:none;">
+      <h3>Collier Bag Purchases</h3>
+      <ul id="purchases-list"></ul>
+      <div id="delivery" style="display:none;">
+        <h4>Download Link:</h4>
+        <a href="COLLIER_BAG_DOWNLOAD_URL" target="_blank">Download Collier Bag</a>
+      </div>
+    </div>
+  </section>  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-app.js";
+    import { getFirestore, collection, addDoc, query, orderBy, onSnapshot, serverTimestamp } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore.js";
+
+    const firebaseConfig = {
+      apiKey: "YOUR_API_KEY",
+      authDomain: "janlochat.firebaseapp.com",
+      projectId: "janlochat",
+      storageBucket: "janlochat.appspot.com",
+      messagingSenderId: "SENDER_ID",
+      appId: "APP_ID"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+    const purchasesRef = collection(db, "purchases");
+
+    window.purchaseCollier = async () => {
+      try {
+        await addDoc(purchasesRef, {
+          product: "Collier bag",
+          customerName: "Anonymous", // or collect from a form
+          timestamp: serverTimestamp()
+        });
+        alert("Thank you for your purchase! You'll receive the item soon.");
+      } catch (err) {
+        console.error("Purchase error:", err);
+        alert("There was a problem processing your purchase.");
+      }
+    };
+
+    const ADMIN_PASSWORD = "yourStrongPasswordHere";
+
+    window.login = () => {
+      const input = document.getElementById("password").value;
+      if (input === ADMIN_PASSWORD) {
+        document.getElementById("dashboard").style.display = "block";
+        document.getElementById("delivery").style.display = "block";
+        loadPurchases();
+      } else {
+        alert("Incorrect password.");
+      }
+    };
+
+    function loadPurchases() {
+      const q = query(purchasesRef, orderBy("timestamp", "desc"));
+      onSnapshot(q, (snapshot) => {
+        const list = document.getElementById("purchases-list");
+        list.innerHTML = "";
+        snapshot.forEach((doc) => {
+          const data = doc.data();
+          if (data.product === "Collier bag") {
+            const li = document.createElement("li");
+            li.textContent = `${data.customerName} bought at ${new Date(data.timestamp?.seconds * 1000).toLocaleString()}`;
+       git init
+git remote add origin https://github.com/janlostudios/Shop.git
+git add .
+git commit -m "Initial Shop Setup"
+git push -u origin master     list.appendChild(li);
+          }
+        });
+      });
+    }
+  </script></body>
+</html>
