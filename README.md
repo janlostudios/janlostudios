@@ -1,77 +1,186 @@
-## Hi there 👋
-
-<!--
-**janlostudios/janlostudios** is a ✨ _special_ ✨ repository because its `README.md` (this file) appears on your GitHub profile.
-
-
-- 
--->
-
+<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Janlo Studios Shop</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #f6f6f9;
+      color: #333;
+    }
+    header {
+      background: #1a1a1a;
+      color: white;
+      padding: 1rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    header input {
+      padding: 0.5rem;
+      width: 200px;
+    }
+    .container {
+      padding: 2rem;
+    }
+    .product {
+      background: white;
+      border-radius: 10px;
+      padding: 1rem;
+      margin-bottom: 1rem;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    }
+    .product img {
+      width: 100%;
+      max-width: 300px;
+      border-radius: 8px;
+    }
+    .product-title {
+      font-size: 1.2rem;
+      margin-top: 0.5rem;
+    }
+    .product button {
+      background: #1a1a1a;
+      color: white;
+      border: none;
+      padding: 0.5rem 1rem;
+      margin-top: 0.5rem;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    #cart {
+      margin-top: 2rem;
+      background: #ffffff;
+      padding: 1rem;
+      border-radius: 10px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    }
+    #adminPanel {
+      display: none;
+      margin-top: 2rem;
+      padding: 1rem;
+      background: #fff;
+      border-radius: 10px;
+    }
+    .footer {
+      text-align: center;
+      padding: 2rem;
+      font-size: 0.9rem;
+      color: #777;
+    }
+  </style>
 </head>
 <body>
-  <h1>Janlo Studios Shop</h1>
 
+<header>
+  <h1>Janlo Studios</h1>
+  <input type="text" id="searchBar" placeholder="Search..."/>
+</header>
+
+<div class="container">
   <!-- Product Section -->
-  <h2>Collier Bag</h2>
-  <p>A digital product</p>
-  <button onclick="purchaseCollier()">Buy Now</button>
-
-  <!-- Admin Login -->
-  <h3>Admin Login</h3>
-  <input type="password" id="password" placeholder="Enter admin password" />
-  <button onclick="login()">Login</button>
-
-  <!-- Admin Dashboard -->
-  <div id="dashboard" style="display:none;">
-    <h3>Purchases</h3>
-    <ul id="purchases-list"></ul>
-
-    <!-- Hidden delivery link only admin can see -->
-    <div id="delivery" style="display:none;">
-      <p>Download: <a href="COLLIER_BAG_DOWNLOAD_URL" target="_blank">Collier Bag</a></p>
-    </div>
+  <div class="product" data-title="Collier Bag">
+    <img src="https://via.placeholder.com/300x200.png?text=Collier+Bag" alt="Collier Bag" />
+    <div class="product-title">Collier Bag</div>
+    <div>Digital fashion design - €12</div>
+    <button onclick="addToCart('Collier Bag', 12)">Add to Cart</button>
   </div>
 
-  <!-- Firebase + JS -->
-  <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-app.js";
-    import { getFirestore, collection, addDoc, query, orderBy, onSnapshot, serverTimestamp } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore.js";
+  <!-- Cart Section -->
+  <div id="cart">
+    <h3>Warenkorb</h3>
+    <ul id="cartList"></ul>
+    <div id="total">Total: €0</div>
+    <button onclick="checkout()">Checkout</button>
+  </div>
 
-    const firebaseConfig = {
-      apiKey: "YOUR_API_KEY",
-      authDomain: "janlochat.firebaseapp.com",
-      projectId: "janlochat",
-      storageBucket: "janlochat.appspot.com",
-      messagingSenderId: "SENDER_ID",
-      appId: "APP_ID"
-    };
+  <!-- Admin Panel -->
+  <div>
+    <h3>Admin Login</h3>
+    <input type="password" id="adminPassword" placeholder="Enter password"/>
+    <button onclick="checkAdmin()">Login</button>
+  </div>
+  <div id="adminPanel">
+    <h3>Admin Dashboard</h3>
+    <p>All purchases will be emailed to: <strong>janlostudios@gmail.com</strong></p>
+    <ul id="purchaseLog"></ul>
+  </div>
+</div>
 
-    const app = initializeApp(firebaseConfig);
-    const db = getFirestore(app);
-    const purchasesRef = collection(db, "purchases");
+<div class="footer">
+  &copy; 2025 Janlo Studios | All rights reserved
+</div>
 
-    window.purchaseCollier = async () => {
-      try {
-        await addDoc(purchasesRef, {
-          product: "Collier bag",
-          customerName: "Anonymous",
-          timestamp: serverTimestamp()
-        });
-        alert("Thank you! Your order has been received.");
-      } catch (error) {
-        console.error("Error:", error);
-        alert("There was an error processing your request.");
-      }
-    
-          }
-        });
-      });
+<script>
+  const cart = [];
+  const adminPassword = "janlo123";
+  const purchases = [];
+
+  function addToCart(item, price) {
+    cart.push({ item, price });
+    updateCart();
+  }
+
+  function updateCart() {
+    const list = document.getElementById("cartList");
+    list.innerHTML = "";
+    let total = 0;
+    cart.forEach((entry, index) => {
+      total += entry.price;
+      const li = document.createElement("li");
+      li.textContent = `${entry.item} - €${entry.price}`;
+      list.appendChild(li);
+    });
+    document.getElementById("total").textContent = `Total: €${total}`;
+  }
+
+  function checkout() {
+    if (cart.length === 0) {
+      alert("Cart is empty.");
+      return;
     }
-  </script>
+    const email = prompt("Enter your email to complete the purchase:");
+    if (email) {
+      alert("Thank you! We will contact you shortly via email.");
+      purchases.push({ email, cart: [...cart] });
+      updateAdminPanel();
+      cart.length = 0;
+      updateCart();
+    }
+  }
+
+  function checkAdmin() {
+    const input = document.getElementById("adminPassword").value;
+    if (input === adminPassword) {
+      document.getElementById("adminPanel").style.display = "block";
+      updateAdminPanel();
+    } else {
+      alert("Wrong password.");
+    }
+  }
+
+  function updateAdminPanel() {
+    const log = document.getElementById("purchaseLog");
+    log.innerHTML = "";
+    purchases.forEach((purchase, index) => {
+      const li = document.createElement("li");
+      li.textContent = `#${index + 1}: ${purchase.email} bought ${purchase.cart.map(i => i.item).join(", ")}`;
+      log.appendChild(li);
+    });
+  }
+
+  // Search filter
+  document.getElementById("searchBar").addEventListener("input", function () {
+    const keyword = this.value.toLowerCase();
+    document.querySelectorAll(".product").forEach(product => {
+      const title = product.getAttribute("data-title").toLowerCase();
+      product.style.display = title.includes(keyword) ? "block" : "none";
+    });
+  });
+</script>
+
 </body>
 </html>
