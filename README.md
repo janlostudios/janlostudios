@@ -67,32 +67,7 @@
         console.error("Error:", error);
         alert("There was an error processing your request.");
       }
-    };
-
-    const ADMIN_PASSWORD = "yourStrongPasswordHere";
-
-    window.login = () => {
-      const input = document.getElementById("password").value;
-      if (input === ADMIN_PASSWORD) {
-        document.getElementById("dashboard").style.display = "block";
-        document.getElementById("delivery").style.display = "block";
-        loadPurchases();
-      } else {
-        alert("Wrong password.");
-      }
-    };
-
-    function loadPurchases() {
-      const q = query(purchasesRef, orderBy("timestamp", "desc"));
-      onSnapshot(q, (snapshot) => {
-        const list = document.getElementById("purchases-list");
-        list.innerHTML = "";
-        snapshot.forEach((doc) => {
-          const data = doc.data();
-          if (data.product === "Collier bag") {
-            const li = document.createElement("li");
-            li.textContent = `${data.customerName} - ${new Date(data.timestamp?.seconds * 1000).toLocaleString()}`;
-            list.appendChild(li);
+    
           }
         });
       });
